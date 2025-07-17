@@ -62,6 +62,14 @@ public class SessionManager extends ManagerBase implements Lifecycle {
 
     }
 
+    public void persist(String sessionId) throws IOException {
+        Session session = super.findSession(sessionId);
+        if (session != null) {
+            store.save(session);
+        }
+    }
+
+
     @Override
     public Session findSession(String id) throws IOException {
         Session session = super.findSession(id);
