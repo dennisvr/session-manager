@@ -2,7 +2,6 @@ package be.iqit.tomcat.session;
 
 import org.apache.catalina.*;
 import org.apache.catalina.session.ManagerBase;
-import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.session.StoreBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -129,7 +128,7 @@ public class SessionManager extends ManagerBase implements Lifecycle {
         super.startInternal();
 
         if (store == null) {
-            log.error(sm.getString("persistentManager.noStore"));
+            log.error(sm.getString("sessionManager.noStore"));
         } else if (store instanceof Lifecycle) {
             ((Lifecycle) store).start();
         }
@@ -144,20 +143,6 @@ public class SessionManager extends ManagerBase implements Lifecycle {
         }
 
         setState(LifecycleState.STOPPING);
-
-        if (getStore() != null && saveOnRestart) {
-            unload();
-        } else {
-            // Expire all active sessions
-            Session[] sessions = findSessions();
-            for (Session value : sessions) {
-                StandardSession session = (StandardSession) value;
-                if (!session.isValid()) {
-                    continue;
-                }
-                session.expire();
-            }
-        }
 
         if (getStore() instanceof Lifecycle) {
             ((Lifecycle) getStore()).stop();
