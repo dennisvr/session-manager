@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group = 'be.iqit'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.tomcat:tomcat-catalina:9.0.90'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java       // publishes the “main” JAR + metadata
+            groupId    = 'be.iqit' // your group
+            artifactId = 'session-manager'      // your artifact
+            version    = '0.0.1'       // your version
+        }
+    }
+    repositories {
+        mavenLocal()               // points to ~/.m2/repository
+    }
+}
