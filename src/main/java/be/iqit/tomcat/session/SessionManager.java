@@ -2,6 +2,7 @@ package be.iqit.tomcat.session;
 
 import org.apache.catalina.*;
 import org.apache.catalina.session.ManagerBase;
+import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.session.StoreBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -88,13 +89,30 @@ public class SessionManager extends ManagerBase implements Lifecycle {
         // See if the Session is in the Store
         try {
             session = getStore().load(id);
-            if(session != null) {
-                add(session);
+            if (session != null) {
+                reactivateLoadedSession(id, session);
             }
         } catch (ClassNotFoundException e) {
             throw new IOException(e);
         }
         return session;
+    }
+
+    private void reactivateLoadedSession(String id, Session session) {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("persistentManager.swapIn", id));
+        }
+
+        session.setManager(this);
+        // make sure the listeners know about it.
+        ((StandardSession) session).tellNew();
+        add(session);
+        ((StandardSession) session).activate();
+        // endAccess() to ensure timeouts happen correctly.
+        // access() to keep access count correct or it will end up
+        // negative
+        session.access();
+        session.endAccess();
     }
 
     @Override
