@@ -89,7 +89,9 @@ public class SessionManager extends ManagerBase implements Lifecycle {
         // See if the Session is in the Store
         try {
             session = getStore().load(id);
-            add(session);
+            if(session != null) {
+                add(session);
+            }
         } catch (ClassNotFoundException e) {
             throw new IOException(e);
         }
